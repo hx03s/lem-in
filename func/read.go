@@ -18,6 +18,7 @@ func ReadLine(filename string) (int, []*Room, error) {
     scanner := bufio.NewScanner(file)
     var numAnts int
     var rooms []*Room
+    var Farm *AntFarm
     roomMap := make(map[string]*Room)
     lineNum := 1
 
@@ -27,6 +28,7 @@ func ReadLine(filename string) (int, []*Room, error) {
         if err != nil {
             return 0, nil, fmt.Errorf("line %d: invalid number of ants", lineNum)
         }
+      Farm.NumAnts = numAnts
         lineNum++
     } else {
         return 0, nil, fmt.Errorf("empty file")
@@ -46,7 +48,7 @@ func ReadLine(filename string) (int, []*Room, error) {
                 rooms = append(rooms, room)
                 roomMap[name] = room
             } else if strings.Contains(name,"-") {
-				room1, room2, err := parseLink(fields[0], roomMap)
+				room1, room2, err := ParseLink(fields[0], roomMap)
 				if err != nil {
 					return 0, nil, fmt.Errorf("line %d: %v", lineNum, err)
 				}
@@ -57,7 +59,7 @@ func ReadLine(filename string) (int, []*Room, error) {
                 return 0, nil, fmt.Errorf("line %d: invalid format", lineNum)
             }
         } else if len(fields) == 3 { // Regular room
-            name, x, y, err := parseRoom(fields)
+            name, x, y, err := ParseRoom(fields)
             if err != nil {
                 return 0, nil, fmt.Errorf("line %d: %v", lineNum, err)
             }
@@ -84,10 +86,19 @@ func ReadLine(filename string) (int, []*Room, error) {
         return 0, nil, fmt.Errorf("error reading file: %v", err)
     }
 
+    if _, exists := roomMap["##start"]; !exists {
+        return 0, nil, fmt.Errorf("start room doesn't exists!")
+    }
+
+    if _, exists := roomMap["##end"]; !exists {
+        return 0, nil, fmt.Errorf("end room doesn't exists!")
+    }
+    
+
     return numAnts, rooms, nil
 }
 
-func parseRoom(fields []string) (string, int, int, error) {
+func ParseRoom(fields []string) (string, int, int, error) {
     name := fields[0]
     if strings.HasPrefix(name, "L") || strings.Contains(name, "-") || strings.Contains(name, "#") {
         return "", 0, 0, fmt.Errorf("invalid room name '%s'", name)
@@ -106,7 +117,7 @@ func parseRoom(fields []string) (string, int, int, error) {
     return name, x, y, nil
 }
 
-func parseLink(line string, roomMap map[string]*Room) (*Room, *Room, error) {
+func ParseLink(line string, roomMap map[string]*Room) (*Room, *Room, error) {
     fields := strings.Split(line, "-")
     if len(fields) != 2 {
         return nil, nil, fmt.Errorf("invalid tunnel format: %s", line)

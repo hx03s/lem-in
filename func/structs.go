@@ -23,15 +23,15 @@ type AntFarm struct {
 	Rooms     []*Room
 }
 
-type Node struct {
-	Name      string
-	Neighbors []*Node
-}
+// type Node struct {
+// 	Name      string
+// 	Neighbors []*Node
+// }
 
-type Ant struct {
-	Id          int
-	Farm        *AntFarm
-	CurrentNode *Node
-	NextNode    *Node
-	Visited     bool
-}
+// type Ant struct {
+// 	Id          int
+// 	Farm        *AntFarm
+// 	CurrentNode *Node
+// 	NextNode    *Node
+// 	Visited     bool
+// }
