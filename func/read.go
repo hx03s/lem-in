@@ -8,94 +8,114 @@ import (
 	"strings"
 )
 
-func ReadLine(filename string) (int, []*Room, error) {
-    file, err := os.Open(filename)
-    if err != nil {
-        return 0, nil, fmt.Errorf("failed to open file: %v", err)
-    }
-    defer file.Close()
+func ReadLine(filename string) (*AntFarm, []*Room, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to open file: %v", err)
+	}
+	defer file.Close()
 
-    scanner := bufio.NewScanner(file)
-    var numAnts int
-    var rooms []*Room
-    var Farm *AntFarm
-    roomMap := make(map[string]*Room)
-    lineNum := 1
+	scanner := bufio.NewScanner(file)
+	var rooms []*Room
+	var Farm = &AntFarm{}
+	roomMap := make(map[string]*Room)
+    var roomCounter int
+	lineNum := 1
 
-    // Read the number of ants
-    if scanner.Scan() {
-        numAnts, err = strconv.Atoi(scanner.Text())
-        if err != nil {
-            return 0, nil, fmt.Errorf("line %d: invalid number of ants", lineNum)
-        }
-      Farm.NumAnts = numAnts
-        lineNum++
-    } else {
-        return 0, nil, fmt.Errorf("empty file")
-    }
+	// Read the number of ants
+	if scanner.Scan() {
+		Farm.NumAnts, err = strconv.Atoi(scanner.Text())
+		if err != nil {
+			return nil, nil, fmt.Errorf("line %d: invalid number of ants", lineNum)
+		}
+		lineNum++
+	} else {
+		return nil, nil, fmt.Errorf("empty file")
+	}
 
-    // Read rooms and links
-    for scanner.Scan() {
-        line := scanner.Text()
-        fields := strings.Fields(line)
+	// Read rooms and links
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
 
-        if len(fields) == 1 { // Special rooms (##start, ##end)
-            name := fields[0]
-            if name == "##start" || name == "##end" {
-                room := &Room{
-                    Name: name,
+		if len(fields) == 1 { // Special rooms (##start, ##end)
+			name := fields[0]
+            //if start or end already exits and name is equal ##start or ##end error more than start point or end point
+			if name == "##start" || name == "##end" {
+                if _, exists := roomMap[name]; exists {
+                    return nil, nil, fmt.Errorf("line %d: %s already exists", lineNum, name)
                 }
-                rooms = append(rooms, room)
-                roomMap[name] = room
-            } else if strings.Contains(name,"-") {
+				room := &Room{
+					Name: name,
+				}
+                if roomCounter > 1 {
+                    rooms[len(rooms)-1].Next = room
+                }
+				rooms = append(rooms, room)
+                roomCounter++
+				roomMap[name] = room
+			} else if strings.Contains(name, "-") {
 				room1, room2, err := ParseLink(fields[0], roomMap)
 				if err != nil {
-					return 0, nil, fmt.Errorf("line %d: %v", lineNum, err)
+					return nil, nil, fmt.Errorf("line %d: %v", lineNum, err)
 				}
-	
+
 				room1.Links = append(room1.Links, &Link{Room: room2})
 				room2.Links = append(room2.Links, &Link{Room: room1})
 			} else {
-                return 0, nil, fmt.Errorf("line %d: invalid format", lineNum)
-            }
-        } else if len(fields) == 3 { // Regular room
-            name, x, y, err := ParseRoom(fields)
-            if err != nil {
-                return 0, nil, fmt.Errorf("line %d: %v", lineNum, err)
-            }
+				return nil, nil, fmt.Errorf("line %d: invalid format", lineNum)
+			}
+		} else if len(fields) == 3 { // Regular room
+			name, x, y, err := ParseRoom(fields)
+			if err != nil {
+				return nil, nil, fmt.Errorf("line %d: %v", lineNum, err)
+			}
 
-            if _, exists := roomMap[name]; exists {
-                return 0, nil, fmt.Errorf("line %d: duplicate room '%s'", lineNum, name)
-            }
+			if _, exists := roomMap[name]; exists {
+				return nil, nil, fmt.Errorf("line %d: duplicate room '%s'", lineNum, name)
+			}
 
-            room := &Room{
-                Name:   name,
-                CoordX: x,
-                CoordY: y,
+			room := &Room{
+				Name:   name,
+				CoordX: x,
+				CoordY: y,
+			}
+            if roomCounter > 0 {
+                rooms[len(rooms)-1].Next = room
             }
-            rooms = append(rooms, room)
-            roomMap[name] = room
-        } else {
-            return 0, nil, fmt.Errorf("line %d: invalid format", lineNum)
-        }
+			rooms = append(rooms, room)
+            roomCounter++
+			roomMap[name] = room
+		} else {
+			return nil, nil, fmt.Errorf("line %d: invalid format", lineNum)
+		}
 
-        lineNum++
+		lineNum++
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, nil, fmt.Errorf("error reading file: %v", err)
+	}
+
+	if _, exists := roomMap["##start"]; !exists {
+		return nil, nil, fmt.Errorf("start room doesn't exists!")
+	}
+
+	if _, exists := roomMap["##end"]; !exists {
+		return nil, nil, fmt.Errorf("end room doesn't exists!")
+	}
+    if rooms[len(rooms)-1].Name == "##start" || rooms[len(rooms)-1].Name == "##end" {
+        return nil,nil,fmt.Errorf("No room assigned to %s", rooms[len(rooms)-1].Name)
     }
-
-    if err := scanner.Err(); err != nil {
-        return 0, nil, fmt.Errorf("error reading file: %v", err)
-    }
-
-    if _, exists := roomMap["##start"]; !exists {
-        return 0, nil, fmt.Errorf("start room doesn't exists!")
-    }
-
-    if _, exists := roomMap["##end"]; !exists {
-        return 0, nil, fmt.Errorf("end room doesn't exists!")
+    if roomMap["##start"].Next != nil {
+        roomMap["##start"].Next.IsStart = true
     }
     
-
-    return numAnts, rooms, nil
+    if roomMap["##end"].Next != nil {
+         roomMap["##end"].Next.IsEnd = true
+    }
+   
+	return Farm, rooms, nil
 }
 
 func ParseRoom(fields []string) (string, int, int, error) {

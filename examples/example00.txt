@@ -1,7 +1,6 @@
 4
 ##start
 0 0 3
-##start
 2 2 5
 3 4 0
 ##end
@@ -9,3 +8,4 @@
 0-2
 2-3
 3-1
+handle case end start or start end in a row.

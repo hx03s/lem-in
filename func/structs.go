@@ -9,6 +9,7 @@ type Room struct {
 	IsEnd   bool
 	Visited bool
 	Links   []*Link
+	Next *Room
 }
 
 type Link struct {
@@ -22,6 +23,8 @@ type AntFarm struct {
 	EndRoom   *Room
 	Rooms     []*Room
 }
+
+
 
 // type Node struct {
 // 	Name      string
