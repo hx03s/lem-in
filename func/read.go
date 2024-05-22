@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-func ReadLine(filename string) (*AntFarm, []*Room, error) {
+func ReadLine(filename string) (*AntFarm, []*Room, error, map[string]*Room) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to open file: %v", err)
+		return nil, nil, fmt.Errorf("failed to open file: %v", err),nil
 	}
 	defer file.Close()
 
@@ -26,11 +26,11 @@ func ReadLine(filename string) (*AntFarm, []*Room, error) {
 	if scanner.Scan() {
 		Farm.NumAnts, err = strconv.Atoi(scanner.Text())
 		if err != nil {
-			return nil, nil, fmt.Errorf("line %d: invalid number of ants", lineNum)
+			return nil, nil, fmt.Errorf("line %d: invalid number of ants", lineNum),nil
 		}
 		lineNum++
 	} else {
-		return nil, nil, fmt.Errorf("empty file")
+		return nil, nil, fmt.Errorf("empty file"),nil
 	}
 
 	// Read rooms and links
@@ -43,7 +43,7 @@ func ReadLine(filename string) (*AntFarm, []*Room, error) {
             //if start or end already exits and name is equal ##start or ##end error more than start point or end point
 			if name == "##start" || name == "##end" {
                 if _, exists := roomMap[name]; exists {
-                    return nil, nil, fmt.Errorf("line %d: %s already exists", lineNum, name)
+                    return nil, nil, fmt.Errorf("line %d: %s already exists", lineNum, name),nil
                 }
 				room := &Room{
 					Name: name,
@@ -57,22 +57,22 @@ func ReadLine(filename string) (*AntFarm, []*Room, error) {
 			} else if strings.Contains(name, "-") {
 				room1, room2, err := ParseLink(fields[0], roomMap)
 				if err != nil {
-					return nil, nil, fmt.Errorf("line %d: %v", lineNum, err)
+					return nil, nil, fmt.Errorf("line %d: %v", lineNum, err),nil
 				}
 
 				room1.Links = append(room1.Links, &Link{Room: room2})
 				room2.Links = append(room2.Links, &Link{Room: room1})
 			} else {
-				return nil, nil, fmt.Errorf("line %d: invalid format", lineNum)
+				return nil, nil, fmt.Errorf("line %d: invalid format", lineNum),nil
 			}
 		} else if len(fields) == 3 { // Regular room
 			name, x, y, err := ParseRoom(fields)
 			if err != nil {
-				return nil, nil, fmt.Errorf("line %d: %v", lineNum, err)
+				return nil, nil, fmt.Errorf("line %d: %v", lineNum, err),nil
 			}
 
 			if _, exists := roomMap[name]; exists {
-				return nil, nil, fmt.Errorf("line %d: duplicate room '%s'", lineNum, name)
+				return nil, nil, fmt.Errorf("line %d: duplicate room '%s'", lineNum, name),nil
 			}
 
 			room := &Room{
@@ -87,35 +87,37 @@ func ReadLine(filename string) (*AntFarm, []*Room, error) {
             roomCounter++
 			roomMap[name] = room
 		} else {
-			return nil, nil, fmt.Errorf("line %d: invalid format", lineNum)
+			return nil, nil, fmt.Errorf("line %d: invalid format", lineNum),nil
 		}
 
 		lineNum++
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, nil, fmt.Errorf("error reading file: %v", err)
+		return nil, nil, fmt.Errorf("error reading file: %v", err),nil
 	}
 
 	if _, exists := roomMap["##start"]; !exists {
-		return nil, nil, fmt.Errorf("start room doesn't exists!")
+		return nil, nil, fmt.Errorf("start room doesn't exists!"),nil
 	}
 
 	if _, exists := roomMap["##end"]; !exists {
-		return nil, nil, fmt.Errorf("end room doesn't exists!")
+		return nil, nil, fmt.Errorf("end room doesn't exists!"),nil
 	}
     if rooms[len(rooms)-1].Name == "##start" || rooms[len(rooms)-1].Name == "##end" {
-        return nil,nil,fmt.Errorf("No room assigned to %s", rooms[len(rooms)-1].Name)
+        return nil,nil,fmt.Errorf("No room assigned to %s", rooms[len(rooms)-1].Name),nil
     }
     if roomMap["##start"].Next != nil {
         roomMap["##start"].Next.IsStart = true
+		Farm.StartRoom = roomMap["##start"].Next
     }
     
     if roomMap["##end"].Next != nil {
          roomMap["##end"].Next.IsEnd = true
+		 Farm.EndRoom = roomMap["##end"].Next
     }
    
-	return Farm, rooms, nil
+	return Farm, rooms, nil,roomMap
 }
 
 func ParseRoom(fields []string) (string, int, int, error) {
