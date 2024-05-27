@@ -22,8 +22,12 @@ type AntFarm struct {
 	StartRoom *Room
 	EndRoom   *Room
 	Rooms     []*Room
+	Paths [][]*Room
 }
 
+type path struct {
+	Rooms []*Room
+}
 
 
 // type Node struct {

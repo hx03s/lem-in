@@ -48,7 +48,7 @@ func ReadLine(filename string) (*AntFarm, []*Room, error, map[string]*Room) {
 				room := &Room{
 					Name: name,
 				}
-                if roomCounter > 1 {
+                if roomCounter > 0 {
                     rooms[len(rooms)-1].Next = room
                 }
 				rooms = append(rooms, room)

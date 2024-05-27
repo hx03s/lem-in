@@ -39,5 +39,15 @@ func main() {
 		}
 		fmt.Println()
 	}
+	
+	farm = lem.Edmonds(farm)
+	fmt.Println("Paths:")
+	 for _, path := range farm.Paths {
+fmt.Println("path: ")
+		for _, room := range path {
+			fmt.Printf("  %s (%d, %d)-", room.Name, room.CoordX, room.CoordY)
+		}
+		fmt.Println()
+	}
 }
 
