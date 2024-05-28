@@ -40,14 +40,20 @@ func main() {
 		fmt.Println()
 	}
 	
-	farm = lem.Edmonds(farm)
+	farm.Paths = lem.Edmonds(farm)
+	farm = lem.AssignAnts(farm)
 	fmt.Println("Paths:")
 	 for _, path := range farm.Paths {
 fmt.Println("path: ")
-		for _, room := range path {
+		for _, room := range path.Rooms {
 			fmt.Printf("  %s (%d, %d)-", room.Name, room.CoordX, room.CoordY)
+		}
+		for _, ant := range path.Queue {
+			fmt.Printf("  L%v ",ant.Id)
 		}
 		fmt.Println()
 	}
+	lem.MoveAnt(farm)
+	
 }
 

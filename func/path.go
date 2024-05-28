@@ -1,39 +1,39 @@
 package lem
 
-func Edmonds(farm *AntFarm) *AntFarm {
-	// create a edmonds karp algo to find all possible paths and save them in Antfarm.paths if the path is viable
-	start := farm.StartRoom
-	current := start
-	current.Visited = true
-	start.Visited = true
-	path := path {}
-	path.Rooms = append(path.Rooms,start)
-	pathsfound := false
+func Edmonds(farm *AntFarm) []*Path {
+    start := []*Room{farm.StartRoom}
+    end := farm.EndRoom
+    visited := make(map[*Room]bool)
+    queue := []*Path{{Rooms: start}}
+    var paths []*Path
 
-	for !pathsfound {
-		for _, startlink := range start.Links {
-			if startlink.Room.Visited == false {
-				startlink.Room.Visited = true
-				current = startlink.Room
-				path.Rooms = append(path.Rooms, current)
-				for !current.IsEnd {
-					for _, currentlink := range current.Links {
-						if currentlink.Room.Visited == false {
-							currentlink.Room.Visited = true
-							current = currentlink.Room
-							path.Rooms = append(path.Rooms, current)
-							break
-						}
-					}
-				}
-				farm.Paths = append(farm.Paths, path.Rooms)
-				path.Rooms = nil
-				current.Visited = false
-				path.Rooms = append(path.Rooms, start)
-			}
-			pathsfound = true
+    for len(queue) > 0 {
+        path := queue[0]
+        queue = queue[1:]
+        currentRoom := path.Rooms[len(path.Rooms)-1]
+
+        if currentRoom == end {
+            newPath := &Path{Rooms: make([]*Room, len(path.Rooms))}
+            copy(newPath.Rooms, path.Rooms)
+            paths = append(paths, newPath)
+            continue
+        }
+		if visited[currentRoom] {
+			continue
 		}
-	}
 
-	return farm
+        visited[currentRoom] = true
+
+        for _, link := range currentRoom.Links {
+            nextRoom := link.Room
+            if !visited[nextRoom] {
+                newPath := &Path{Rooms: make([]*Room, len(path.Rooms), len(path.Rooms)+1)}
+                copy(newPath.Rooms, path.Rooms)
+                newPath.Rooms = append(newPath.Rooms, nextRoom)
+                queue = append(queue, newPath)
+            }
+        }
+    }
+
+    return paths
 }
