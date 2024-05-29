@@ -25,6 +25,9 @@ func main() {
     if roommap == nil {
         return
     }
+	if rooms != nil {
+
+	}
 
 	fmt.Printf("Number of ants: %d\n", farm.NumAnts)
 	fmt.Println("Rooms:")

@@ -19,7 +19,7 @@ func MoveAnt(farm *AntFarm) {
                     moved[CurrentAnt] = true
                     continue
                 }
-				if full[CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1]] == true {
+				if full[CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1]] == true && CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1] != farm.EndRoom {
 					continue
 				}
 				CurrentAnt.CurrentRoom = CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1]
