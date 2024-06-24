@@ -1,5 +1,6 @@
 10
 ##start
+#jhshd
 start 1 6
 0 4 8
 o 6 8
@@ -15,20 +16,20 @@ c 8 1
 k 11 2
 ##end
 end 11 6
-start-t
-n-e
-a-m
-A-c
+start-0
 0-o
+o-n
+n-e
+e-end
+start-t
+A-c
+a-m
 E-a
 k-end
 start-h
-o-n
 m-end
 t-E
-start-0
 h-A
-e-end
 c-k
 n-m
 h-n

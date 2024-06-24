@@ -79,27 +79,27 @@ func PathCost(Current *Path) int {
     return len(Current.Rooms) + Current.NumAnts
 }
 
-func Lowest(paths []*Path, path *Path) int {
-    lowestCost := PathCost(path)
-    lowestIndex := 0
-    allEqual := true
+// func Lowest(paths []*Path, path *Path) int {
+//     lowestCost := PathCost(path)
+//     lowestIndex := 0
+//     allEqual := true
 
-    for i, current := range paths {
-        if PathCost(current) < lowestCost {
-            lowestCost = PathCost(current)
-            lowestIndex = i
-            allEqual = false
-        } else if PathCost(current) != lowestCost {
-            allEqual = false
-        }
-    }
+//     for i, current := range paths {
+//         if PathCost(current) < lowestCost {
+//             lowestCost = PathCost(current)
+//             lowestIndex = i
+//             allEqual = false
+//         } else if PathCost(current) != lowestCost {
+//             allEqual = false
+//         }
+//     }
 
-    if allEqual {
-        return 0
-    }
+//     if allEqual {
+//         return 0
+//     }
 
-    return lowestIndex
-}
+//     return lowestIndex
+// }
 
 
 func GetRoomIndex(current *Room,path *Path) int {
