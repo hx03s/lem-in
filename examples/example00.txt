@@ -1,4 +1,3 @@
-$ go run . example00.txt
 4
 ##start
 0 0 3
