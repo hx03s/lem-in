@@ -43,7 +43,7 @@ func Edmonds(farm *AntFarm) []*Path {
         //     continue
         // }
 
-        // visited[currentRoom] = true
+        visited[currentRoom] = true
 
         for _, link := range currentRoom.Links {
             nextRoom := link.Room

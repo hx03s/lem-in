@@ -28,6 +28,9 @@ func ReadLine(filename string) (*AntFarm, []*Room, error, map[string]*Room) {
 		if err != nil {
 			return nil, nil, fmt.Errorf("line %d: invalid number of ants", lineNum),nil
 		}
+		if Farm.NumAnts < 1 || Farm.NumAnts > 50000 {
+			return nil, nil, fmt.Errorf("line %d: invalid number of ants", lineNum),nil
+		}
 		lineNum++
 	} else {
 		return nil, nil, fmt.Errorf("empty file"),nil
@@ -61,7 +64,7 @@ func ReadLine(filename string) (*AntFarm, []*Room, error, map[string]*Room) {
 				}
 
 				room1.Links = append(room1.Links, &Link{Room: room2})
-				// room2.Links = append(room2.Links, &Link{Room: room1})
+				room2.Links = append(room2.Links, &Link{Room: room1})
 			} else if strings.HasPrefix(name,"#") {
 				continue
 			} else {

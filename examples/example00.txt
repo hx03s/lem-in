@@ -1,35 +1,11 @@
-10
+$ go run . example00.txt
+4
 ##start
-#jhshd
-start 1 6
-0 4 8
-o 6 8
-n 6 6
-e 8 4
-t 1 9
-E 5 9
-a 8 9
-m 8 6
-h 4 6
-A 5 2
-c 8 1
-k 11 2
+0 0 3
+2 2 5
+3 4 0
 ##end
-end 11 6
-start-0
-0-o
-o-n
-n-e
-e-end
-start-t
-A-c
-a-m
-E-a
-k-end
-start-h
-m-end
-t-E
-h-A
-c-k
-n-m
-h-n
+1 8 3
+0-2
+2-3
+3-1
