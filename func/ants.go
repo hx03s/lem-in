@@ -5,6 +5,7 @@ import "fmt"
 func MoveAnt(farm *AntFarm) {
 	moved := make(map[*Ant]bool)
 	full := make(map[*Room]bool)
+	direct := false
 	for {
 		if AllEnd(farm.Paths) {
 			break
@@ -19,6 +20,14 @@ func MoveAnt(farm *AntFarm) {
                     moved[CurrentAnt] = true
                     continue
                 }
+				if len(CurrentAnt.Path.Rooms) == 2 && CurrentAnt.Path.Rooms[0] == farm.StartRoom && direct == false{
+					direct = true
+					CurrentAnt.CurrentRoom = CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1]
+					fmt.Printf("L%v-%v ", CurrentAnt.Id, CurrentAnt.CurrentRoom.Name)
+					continue
+				} else if len(CurrentAnt.Path.Rooms) == 2 && CurrentAnt.Path.Rooms[0] == farm.StartRoom && direct == true{
+					continue
+				}
 				if full[CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1]] == true && CurrentAnt.Path.Rooms[GetRoomIndex(CurrentAnt.CurrentRoom, CurrentAnt.Path)+1] != farm.EndRoom {
 					continue
 				}
@@ -29,6 +38,7 @@ func MoveAnt(farm *AntFarm) {
 		}
 		fmt.Println()
 		Reset(farm, moved)
+		direct = false
 	}
 }
 

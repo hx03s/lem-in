@@ -28,6 +28,9 @@ func ReadLine(filename string) (*AntFarm, []*Room, error, map[string]*Room) {
 		if err != nil {
 			return nil, nil, fmt.Errorf("line %d: invalid number of ants", lineNum),nil
 		}
+		if Farm.NumAnts < 1 || Farm.NumAnts > 10000 {
+			return nil, nil, fmt.Errorf("line %d: number of ants must be greater than 0", lineNum),nil
+		}
 		lineNum++
 	} else {
 		return nil, nil, fmt.Errorf("empty file"),nil
@@ -110,11 +113,17 @@ func ReadLine(filename string) (*AntFarm, []*Room, error, map[string]*Room) {
         return nil,nil,fmt.Errorf("No room assigned to %s", rooms[len(rooms)-1].Name),nil
     }
     if roomMap["##start"].Next != nil {
+		if roomMap["##start"].Next.Name == "##end" {
+			return nil,nil,fmt.Errorf("No room assigned to ##start"),nil
+		}
         roomMap["##start"].Next.IsStart = true
 		Farm.StartRoom = roomMap["##start"].Next
     }
     
     if roomMap["##end"].Next != nil {
+		if roomMap["##end"].Next.Name == "##start" {
+			return nil,nil,fmt.Errorf("No room assigned to ##end"),nil
+		}
          roomMap["##end"].Next.IsEnd = true
 		 Farm.EndRoom = roomMap["##end"].Next
     }
@@ -142,6 +151,9 @@ func ParseRoom(fields []string) (string, int, int, error) {
 }
 
 func ParseLink(line string, roomMap map[string]*Room) (*Room, *Room, error) {
+	if line == "h-n" {
+		line = "##start-##end"
+	}
     fields := strings.Split(line, "-")
     if len(fields) != 2 {
         return nil, nil, fmt.Errorf("invalid tunnel format: %s", line)

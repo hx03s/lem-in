@@ -3,6 +3,7 @@ package lem
 import "math"
 
 func Edmonds(farm *AntFarm) []*Path {
+    direct := false
     start := []*Room{farm.StartRoom}
     end := farm.EndRoom
     visited := make(map[*Room]bool)
@@ -19,24 +20,27 @@ func Edmonds(farm *AntFarm) []*Path {
             newPath := &Path{Rooms: make([]*Room, len(path.Rooms))}
             copy(newPath.Rooms, path.Rooms)
             paths = append(paths, newPath)
+            if len(newPath.Rooms) == 2 {
+                direct = true
+            }
 
             // Reset visited status of rooms not part of finalized path
-            // for room := range visited {
-            //     if room == farm.StartRoom {
-            //         continue
-            //     }
-            //     visited[room] = false
-            // }
-            // for _, currentpath := range paths {
-            //     for _, currentroom := range currentpath.Rooms {
-            //         if currentroom == farm.EndRoom {
-            //             continue
-            //         }
-            //     visited[currentroom] = true
-            //     } 
-            // }
-            // queue = queue[:0]
-            // queue = []*Path{{Rooms: start}}
+            for room := range visited {
+                if room == farm.StartRoom {
+                    continue
+                }
+                visited[room] = false
+            }
+            for _, currentpath := range paths {
+                for _, currentroom := range currentpath.Rooms {
+                    if currentroom == farm.EndRoom {
+                        continue
+                    }
+                visited[currentroom] = true
+                } 
+            }
+            queue = queue[:0]
+            queue = []*Path{{Rooms: start}}
             continue
         }
         // if visited[currentRoom] {
@@ -46,6 +50,9 @@ func Edmonds(farm *AntFarm) []*Path {
         visited[currentRoom] = true
 
         for _, link := range currentRoom.Links {
+            if direct == true && currentRoom == farm.StartRoom && link.Room == farm.EndRoom {
+                    continue
+            }
             nextRoom := link.Room
             if !visited[nextRoom] {
                 // visited[nextRoom] = true
@@ -57,7 +64,7 @@ func Edmonds(farm *AntFarm) []*Path {
         }
     }
 
-    paths = chooseOptimalPaths(paths, farm.StartRoom)
+    // paths = chooseOptimalPaths(paths, farm.StartRoom)
 
     return paths
 }
